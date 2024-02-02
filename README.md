@@ -7,5 +7,5 @@ Broadcast Warning to player using ARRCON.EXE
 Auto Update check on start and restarts
 
 dependancies:
-
+Windows Powershell
 https://github.com/radj307/ARRCON
