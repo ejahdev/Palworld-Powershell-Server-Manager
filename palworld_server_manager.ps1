@@ -8,8 +8,8 @@ if (-not $isAdmin) {
     Exit
 }
 
-$steamCMD = "C:\steamcmd" # Insert path to steamcmd
-$PalworldFolder = "C:\YOUR\SERVER\PATH" # Insert path to PALSERVER
+$steamCMD = "C:\SteamCMD" # Insert path to steamcmd
+$PalworldFolder = "C:\PATH\TO\PALWORLD\SERVER" # Insert path to PALSERVER
 
 $autoUpdate = $true # Set True or False if you want to auto-update your server during restarts
 
@@ -20,11 +20,13 @@ $restart_warning = 60 # int in seconds before server restart a warning messsage 
 $arrconPath = "C:\ARRCON.exe" # Set to ARRCON.exe path
 $rconHost = "127.0.0.1" # change to your rcon host if not local
 $rconPort = "27025" # change to your desired port if not default
-$rconPassword = "YOUR_PASSWORD_HERE" # Insert rcon password
+$rconPassword = "RCON_PASSWORD_HERE" # Insert rcon password
 $broadcast_message = "SERVER_RESTARTING_IN_60_SECONDS!" # Change as desired
 
 $discordWebhookEnabled = $true # Set to $true to enable Discord webhook messages, and $false to disable it
-$discordWebhookUrl = "YOUR_DISCORD_WEBHOOK_URL_HERE" # Change to your discord webhook url
+$tagRoleEnabled = $true # Set to $true to enable tagging a role in the webhook message when an update is found, and $false to disable it
+$discordRoleID = "ROLE_ID_NUMBER" # Replace with ID of the discord role to tag in webhook message.
+$discordWebhookUrl = "DISCORD_WEBHOOK_URL" # Change to your discord webhook url
 
 $log_file = "Palworld_ServerLog.txt" # Creates log file in the same path as ps1 script
 
@@ -36,8 +38,6 @@ function check_program {
         if ($PalworldServer -eq $null){
             Write-Host "["$(Get-Date)"] " "Server Not Running. Starting Server."; "["+$(Get-Date)+"] " + "Server Not Running. Starting Server." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
             start_server
-            # Send a message to Discord when the script starts or when the server starts
-            Send-DiscordMessage -Message "Server has started."
         } else {
             Write-Host "["$(Get-Date)"] " "Server Running Normally."; "["+$(Get-Date)+"] " + "Server Running Normally." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
         }
@@ -49,8 +49,10 @@ function check_program {
         if ($server_timer -ge ($restart_interval - $restart_warning) -and -not $warning_sent) {
             # Broadcast a warning message to users
             Write-Host "["$(Get-Date)"] " "Broadcasting warning message to users."; "["+$(Get-Date)+"] " + "Broadcasting warning message to users." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
-            Broadcast-Message $broadcast_message
-            Send-DiscordMessage -Message "Server will restart in 60 seconds."
+            Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster:
+            
+            Server will restart in $restart_warning seconds." -Title "Palworld Server Status" -Color 16711680
+
             $warning_sent = $true
         }
 
@@ -59,17 +61,30 @@ function check_program {
             Stop-Process -Name "PalServer-Win64-Test-Cmd" -ErrorAction SilentlyContinue
             Stop-Process -Name "PalServer" -ErrorAction SilentlyContinue
             $server_timer=0
-
-            Send-DiscordMessage -Message "Server restarting now."
+            Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster:
+            
+            Server restarting now." -Title "Palworld Server Status" -Color 7582538
             
             if($autoUpdate){
                 $serverVersionCheck = (("$steamCmd\steamcmd.exe +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +app_info_update 1 +app_status 2394010 +quit" | 
                 Select-String "^ - install state:")).Line -replace '^[^:]*:\s*', ''
 
-                if ($serverVersionCheck -like "*update*"){
+                if ($serverVersionCheck -like "*update*") {
                     Write-Host "["$(Get-Date)"] " "Server Has an Update. Update Starting."; "["+$(Get-Date)+"] " + "Server Has an Update. Update Starting." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
                     "$steamCmd\steamcmd.exe +login anonymous +app_update 2394010 validate +quit"
-                    Send-DiscordMessage -Message "Server has an update! Starting upate now."
+                    if ($tagRoleEnabled) {
+                        Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
+                    
+                        Server has an update! Starting upate now.
+                        
+                        Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
+                    } else {
+                        Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
+                    
+                        Server has an update! Starting upate now.
+                        
+                        Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
+                    }
                 } else {
                     Write-Host "["$(Get-Date)"] " "No Update Available. Starting Server."; "["+$(Get-Date)+"] " + "No Update Available. Starting Server." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
                 }
@@ -78,7 +93,9 @@ function check_program {
             $warning_sent = $false
 
             # Send a message to discord indicated the restart is complete
-            Send-DiscordMessage -Message "The server has restarted successfully.!"
+            Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
+            
+            The server has restarted successfully.!" -Title "Palworld Server Status" -Color 65280
         }
 
         if ($backup_timer -ge $backup_interval) {
@@ -97,7 +114,19 @@ function start_server {
         if ($serverVersionCheck -like "*update*"){
             Write-Host "["$(Get-Date)"] " "Server Has an Update. Update Starting."; "["+$(Get-Date)+"] " + "Server Has an Update. Update Starting." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
             "$steamCmd\steamcmd.exe +login anonymous +app_update 2394010 validate +quit"
-            Send-DiscordMessage -Message "Server has an update! Starting upate now."
+            if ($tagRoleEnabled) {
+                Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
+
+                Server has an update! Starting upate now.
+                
+                Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
+            } else {
+                Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
+
+                Server has an update! Starting upate now.
+                
+                Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
+            }
         } else {
             Write-Host "["$(Get-Date)"] " "No Update Available. Starting Server."; "["+$(Get-Date)+"] " + "No Update Available. Starting Server." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
         }
@@ -105,6 +134,11 @@ function start_server {
 
     Start-Process -FilePath "$PalworldFolder\PalServer.exe" -ArgumentList "-useperfthreads -NoAsyncLoadingThread -UseMultithreadForDS"
     Write-Host "["$(Get-Date)"] " "Server Started."; "["+$(Get-Date)+"] " + "Server Started." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
+
+    Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
+
+    Server has started." -Title "Palworld Server Status" -Color 65280
+
     check_program
 }
 
@@ -142,11 +176,19 @@ function backup_server {
 
 function Send-DiscordWebhook {
     param(
-        [string]$Message
+        [string]$Message,
+        [string]$Title,
+        [string]$Color
     )
 
     $json = @{
-        content = $Message
+        embeds = @(
+            @{
+                title = $Title
+                description = $Message
+                color = $Color
+            }
+        )
     } | ConvertTo-Json
 
     try {
@@ -156,14 +198,17 @@ function Send-DiscordWebhook {
     }
 }
 
+
 # Check if Discord integration is enabled before sending messages
 function Send-DiscordMessage {
     param(
-        [string]$Message
+        [string]$Message,
+        [string]$Title,
+        [string]$Color
     )
 
     if ($discordWebhookEnabled) {
-        Send-DiscordWebhook -Message $Message
+        Send-DiscordWebhook -Message $Message -Title $Title -Color $Color
     }
 }
 
