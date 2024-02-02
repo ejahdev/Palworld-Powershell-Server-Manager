@@ -6,6 +6,7 @@
  - Hourly Backups<br>
  - Broadcast Warning to player using ARRCON.EXE<br>
  - Auto Update check on start and restarts<br>
+  - If "$autoUpdate = $true", it checks and applies update if available<br>
 <br><br>
 ### dependancies:<br>
  - Windows Powershell<br>
