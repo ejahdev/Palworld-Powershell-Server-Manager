@@ -8,7 +8,7 @@
  - Auto Update check on start and restarts<br>
    - If "$autoUpdate = $true", it checks and applies update if available<br>
 <br><br>
-### dependancies:<br>
+### Dependencies:<br>
  - Windows Powershell<br>
  - [ARRCON.EXE](https://github.com/radj307/ARRCON)<br><br><br>
 
