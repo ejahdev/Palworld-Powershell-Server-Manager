@@ -7,6 +7,8 @@
  - Broadcast Warning to player using ARRCON.EXE<br>
  - Auto Update check on start and restarts<br>
    - If "$autoUpdate = $true", it checks and applies update if available<br>
+ - Discord webhook status updates
+   - Ability to tag a specific role if update found, so users know to update client<br>
 <br><br>
 ### Dependencies:<br>
  - Windows Powershell<br>
