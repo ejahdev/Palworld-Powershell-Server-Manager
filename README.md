@@ -9,4 +9,9 @@
 <br><br>
 ### dependancies:<br>
  - Windows Powershell<br>
- - [ARRCON.EXE](https://github.com/radj307/ARRCON)<br>
+ - [ARRCON.EXE](https://github.com/radj307/ARRCON)<br><br><br>
+
+### The script does elevate to Administrator to leverage "ROBOCOPY" for the backups.
+
+
+
