@@ -1,7 +1,7 @@
 
 # PalWorld Server Manager Script<br>
 <br><br>
-### It handles:<br>
+### What it handles:<br>
  - Daily Auto Restarts<br>
  - Hourly Backups<br>
  - Broadcast Warning to player using ARRCON.EXE<br>
