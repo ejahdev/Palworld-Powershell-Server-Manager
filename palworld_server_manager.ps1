@@ -23,6 +23,9 @@ $rconPort = "27025" # change to your desired port if not default
 $rconPassword = "YOUR_PASSWORD_HERE" # Insert rcon password
 $broadcast_message = "SERVER_RESTARTING_IN_60_SECONDS!" # Change as desired
 
+$discordWebhookEnabled = $true # Set to $true to enable Discord webhook messages, and $false to disable it
+$discordWebhookUrl = "YOUR_DISCORD_WEBHOOK_URL_HERE" # Change to your discord webhook url
+
 $log_file = "Palworld_ServerLog.txt" # Creates log file in the same path as ps1 script
 
 $warning_sent = $false # do NOT change - makes sure the warning message doesnt send multiples
@@ -33,6 +36,8 @@ function check_program {
         if ($PalworldServer -eq $null){
             Write-Host "["$(Get-Date)"] " "Server Not Running. Starting Server."; "["+$(Get-Date)+"] " + "Server Not Running. Starting Server." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
             start_server
+            # Send a message to Discord when the script starts or when the server starts
+            Send-DiscordMessage -Message "Server has started."
         } else {
             Write-Host "["$(Get-Date)"] " "Server Running Normally."; "["+$(Get-Date)+"] " + "Server Running Normally." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
         }
@@ -45,6 +50,7 @@ function check_program {
             # Broadcast a warning message to users
             Write-Host "["$(Get-Date)"] " "Broadcasting warning message to users."; "["+$(Get-Date)+"] " + "Broadcasting warning message to users." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
             Broadcast-Message $broadcast_message
+            Send-DiscordMessage -Message "Server will restart in 60 seconds."
             $warning_sent = $true
         }
 
@@ -53,6 +59,8 @@ function check_program {
             Stop-Process -Name "PalServer-Win64-Test-Cmd" -ErrorAction SilentlyContinue
             Stop-Process -Name "PalServer" -ErrorAction SilentlyContinue
             $server_timer=0
+
+            Send-DiscordMessage -Message "Server restarting now."
             
             if($autoUpdate){
                 $serverVersionCheck = (("$steamCmd\steamcmd.exe +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +app_info_update 1 +app_status 2394010 +quit" | 
@@ -61,12 +69,16 @@ function check_program {
                 if ($serverVersionCheck -like "*update*"){
                     Write-Host "["$(Get-Date)"] " "Server Has an Update. Update Starting."; "["+$(Get-Date)+"] " + "Server Has an Update. Update Starting." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
                     "$steamCmd\steamcmd.exe +login anonymous +app_update 2394010 validate +quit"
+                    Send-DiscordMessage -Message "Server has an update! Starting upate now."
                 } else {
                     Write-Host "["$(Get-Date)"] " "No Update Available. Starting Server."; "["+$(Get-Date)+"] " + "No Update Available. Starting Server." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
                 }
             }
             start_server
             $warning_sent = $false
+
+            # Send a message to discord indicated the restart is complete
+            Send-DiscordMessage -Message "The server has restarted successfully.!"
         }
 
         if ($backup_timer -ge $backup_interval) {
@@ -85,6 +97,7 @@ function start_server {
         if ($serverVersionCheck -like "*update*"){
             Write-Host "["$(Get-Date)"] " "Server Has an Update. Update Starting."; "["+$(Get-Date)+"] " + "Server Has an Update. Update Starting." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
             "$steamCmd\steamcmd.exe +login anonymous +app_update 2394010 validate +quit"
+            Send-DiscordMessage -Message "Server has an update! Starting upate now."
         } else {
             Write-Host "["$(Get-Date)"] " "No Update Available. Starting Server."; "["+$(Get-Date)+"] " + "No Update Available. Starting Server." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
         }
@@ -125,6 +138,33 @@ function backup_server {
         Write-Host "Error occurred during Robocopy: $_"
     }
 
+}
+
+function Send-DiscordWebhook {
+    param(
+        [string]$Message
+    )
+
+    $json = @{
+        content = $Message
+    } | ConvertTo-Json
+
+    try {
+        Invoke-RestMethod -Uri $discordWebhookUrl -Method Post -Body $json -ContentType "application/json"
+    } catch {
+        Write-Host "Failed to send Discord webhook: $_"
+    }
+}
+
+# Check if Discord integration is enabled before sending messages
+function Send-DiscordMessage {
+    param(
+        [string]$Message
+    )
+
+    if ($discordWebhookEnabled) {
+        Send-DiscordWebhook -Message $Message
+    }
 }
 
 function Broadcast-Message {
