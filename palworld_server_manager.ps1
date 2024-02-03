@@ -66,7 +66,7 @@ function check_program {
             
             Server restarting now." -Title "Palworld Server Status" -Color 7582538
             
-            if($autoUpdate){
+            if ($autoUpdate){
                 $serverVersionCheck = (("$steamCmd\steamcmd.exe +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +app_info_update 1 +app_status 2394010 +quit" | 
                 Select-String "^ - install state:")).Line -replace '^[^:]*:\s*', ''
 
@@ -94,7 +94,7 @@ function check_program {
             $warning_sent = $false
 
             # Send a message to discord indicated the restart is complete
-            Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
+            Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
             
             The server has restarted successfully.!" -Title "Palworld Server Status" -Color 65280
         }
@@ -122,7 +122,7 @@ function start_server {
                 
                 Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
             } else {
-                Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
+                Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster:
 
                 Server has an update! Starting upate now.
                 
