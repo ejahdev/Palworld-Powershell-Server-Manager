@@ -48,6 +48,7 @@ function check_program {
 
         if ($server_timer -ge ($restart_interval - $restart_warning) -and -not $warning_sent) {
             # Broadcast a warning message to users
+            Broadcast-Message $broadcast_message
             Write-Host "["$(Get-Date)"] " "Broadcasting warning message to users."; "["+$(Get-Date)+"] " + "Broadcasting warning message to users." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
             Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster:
             
