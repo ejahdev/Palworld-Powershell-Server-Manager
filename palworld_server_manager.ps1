@@ -76,13 +76,13 @@ function check_program {
                     if ($tagRoleEnabled) {
                         Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
                     
-                        Server has an update! Starting upate now.
+                        Server has an update! Starting update now.
                         
                         Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
                     } else {
                         Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
                     
-                        Server has an update! Starting upate now.
+                        Server has an update! Starting update now.
                         
                         Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
                     }
