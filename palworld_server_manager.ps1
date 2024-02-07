@@ -66,46 +66,47 @@ function check_program {
             
             Server restarting now." -Title "Palworld Server Status" -Color 7582538
             
-        if ($autoUpdate) {
-            Write-Host "["$(Get-Date)"] Checking for server update..."
-            "["+$(Get-Date)+"] Checking for server update..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
+            if ($autoUpdate) {
+                Write-Host "["$(Get-Date)"] Checking for server update..."
+                "["+$(Get-Date)+"] Checking for server update..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
 
-            # Construct the SteamCMD command
-            $steamCMDCommand = "$steamCmd\steamcmd.exe +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +app_info_update 1 +app_status 2394010 +quit"
+                # Construct the SteamCMD command
+                $steamCMDCommand = "$steamCmd\steamcmd.exe +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +app_info_update 1 +app_status 2394010 +quit"
 
-            # Execute the SteamCMD command and capture the output
-            $serverVersionCheck = & cmd /c $steamCMDCommand | Select-String "^ - install state:"
+                # Execute the SteamCMD command and capture the output
+                $serverVersionCheck = & cmd /c $steamCMDCommand | Select-String "^ - install state:"
 
-            if ($serverVersionCheck) {
-                # Extract the installation state from the output
-                $installState = $serverVersionCheck -replace '^[^:]*:\s*', ''
+                if ($serverVersionCheck) {
+                    # Extract the installation state from the output
+                    $installState = $serverVersionCheck -replace '^[^:]*:\s*', ''
 
-                Write-Host "Server Installation State: $installState"  # Output the installation state
+                    Write-Host "Server Installation State: $installState"  # Output the installation state
 
-                if ($installState -eq "uninstalled") {
-                    Write-Host "["$(Get-Date)"] Server update available. Starting update process..."
-                    "["+$(Get-Date)+"] Server update available. Starting update process..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
+                    if ($installState -eq "uninstalled") {
+                        Write-Host "["$(Get-Date)"] Server update available. Starting update process..."
+                        "["+$(Get-Date)+"] Server update available. Starting update process..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
 
-                    # Start the update process using SteamCMD
-                    Start-Process -FilePath "$steamCmd\steamcmd.exe" -ArgumentList "+login anonymous +app_update 2394010 validate +quit" -NoNewWindow -Wait
-                    Send-DiscordMessage -Message "Server has an update! Starting update now."
+                        # Start the update process using SteamCMD
+                        Start-Process -FilePath "$steamCmd\steamcmd.exe" -ArgumentList "+login anonymous +app_update 2394010 validate +quit" -NoNewWindow -Wait
+                        Send-DiscordMessage -Message "Server has an update! Starting update now."
 
-                    Write-Host "["$(Get-Date)"] Server update completed successfully."
-                    "["+$(Get-Date)+"] Server update completed successfully." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
-                } else {
-                    Write-Host "["$(Get-Date)"] No update available. Starting server..."
-                    "["+$(Get-Date)+"] No update available. Starting server..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
+                        Write-Host "["$(Get-Date)"] Server update completed successfully."
+                        "["+$(Get-Date)+"] Server update completed successfully." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
+                    } else {
+                        Write-Host "["$(Get-Date)"] No update available. Starting server..."
+                        "["+$(Get-Date)+"] No update available. Starting server..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
+                    }
                 }
-            }
-        }
-            start_server
-            $warning_sent = $false
-
-            # Send a message to discord indicated the restart is complete
-            Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
             
-            The server has restarted successfully.!" -Title "Palworld Server Status" -Color 65280
-        }
+                start_server
+                $warning_sent = $false
+
+                # Send a message to discord indicated the restart is complete
+                Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
+                
+                The server has restarted successfully.!" -Title "Palworld Server Status" -Color 65280
+            }
+        }    
 
         if ($backup_timer -ge $backup_interval) {
             Write-Host "["$(Get-Date)"] " "Backup Timer Reached. Starting Server Backup."; "["+$(Get-Date)+"] " + "Backup Timer Reached. Starting Server Backup." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
