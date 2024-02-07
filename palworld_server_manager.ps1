@@ -91,11 +91,11 @@ function check_program {
                         if ($tagRoleEnabled) {
                             Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
                             
-                            Server has an update! Starting update now." -Title "Palworld Server Status" -Color 65280
+                            Server has an update! Make sure to update your client!" -Title "Palworld Server Status" -Color 65280
                         } else {
                             Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
                         
-                            Server has an update! Starting update now." -Title "Palworld Server Status" -Color 65280
+                            Server has an update! Make sure to update your client!" -Title "Palworld Server Status" -Color 65280
                         }
 
                         Write-Host "["$(Get-Date)"] Server update completed successfully."
@@ -150,11 +150,11 @@ function start_server {
                 if ($tagRoleEnabled) {
                     Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID>  
                 
-                    Server has an update! Starting update now." -Title "Palworld Server Status" -Color 65280
+                    Server has an update! Make sure to update your client!" -Title "Palworld Server Status" -Color 65280
                 } else {
                     Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
                 
-                    Server has an update! Starting update now." -Title "Palworld Server Status" -Color 65280
+                    Server has an update! Make sure to update your client!" -Title "Palworld Server Status" -Color 65280
                 }
 
                 Write-Host "["$(Get-Date)"] Server update completed successfully."
