@@ -66,30 +66,38 @@ function check_program {
             
             Server restarting now." -Title "Palworld Server Status" -Color 7582538
             
-            if ($autoUpdate){
-                $serverVersionCheck = (("$steamCmd\steamcmd.exe +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +app_info_update 1 +app_status 2394010 +quit" | 
-                Select-String "^ - install state:")).Line -replace '^[^:]*:\s*', ''
+        if ($autoUpdate) {
+            Write-Host "["$(Get-Date)"] Checking for server update..."
+            "["+$(Get-Date)+"] Checking for server update..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
 
-                if ($serverVersionCheck -like "*update*") {
-                    Write-Host "["$(Get-Date)"] " "Server Has an Update. Update Starting."; "["+$(Get-Date)+"] " + "Server Has an Update. Update Starting." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
-                    "$steamCmd\steamcmd.exe +login anonymous +app_update 2394010 validate +quit"
-                    if ($tagRoleEnabled) {
-                        Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
-                    
-                        Server has an update! Starting update now.
-                        
-                        Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
-                    } else {
-                        Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
-                    
-                        Server has an update! Starting update now.
-                        
-                        Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
-                    }
+            # Construct the SteamCMD command
+            $steamCMDCommand = "$steamCmd\steamcmd.exe +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +app_info_update 1 +app_status 2394010 +quit"
+
+            # Execute the SteamCMD command and capture the output
+            $serverVersionCheck = & cmd /c $steamCMDCommand | Select-String "^ - install state:"
+
+            if ($serverVersionCheck) {
+                # Extract the installation state from the output
+                $installState = $serverVersionCheck -replace '^[^:]*:\s*', ''
+
+                Write-Host "Server Installation State: $installState"  # Output the installation state
+
+                if ($installState -eq "uninstalled") {
+                    Write-Host "["$(Get-Date)"] Server update available. Starting update process..."
+                    "["+$(Get-Date)+"] Server update available. Starting update process..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
+
+                    # Start the update process using SteamCMD
+                    Start-Process -FilePath "$steamCmd\steamcmd.exe" -ArgumentList "+login anonymous +app_update 2394010 validate +quit" -NoNewWindow -Wait
+                    Send-DiscordMessage -Message "Server has an update! Starting update now."
+
+                    Write-Host "["$(Get-Date)"] Server update completed successfully."
+                    "["+$(Get-Date)+"] Server update completed successfully." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
                 } else {
-                    Write-Host "["$(Get-Date)"] " "No Update Available. Starting Server."; "["+$(Get-Date)+"] " + "No Update Available. Starting Server." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
+                    Write-Host "["$(Get-Date)"] No update available. Starting server..."
+                    "["+$(Get-Date)+"] No update available. Starting server..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
                 }
             }
+        }
             start_server
             $warning_sent = $false
 
@@ -108,28 +116,36 @@ function check_program {
 }
 
 function start_server {
-    if($autoUpdate){
-        $serverVersionCheck = (("$steamCmd\steamcmd.exe +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +app_info_update 1 +app_status 2394010 +quit" | 
-        Select-String "^ - install state:")).Line -replace '^[^:]*:\s*', ''
+    if ($autoUpdate) {
+        Write-Host "["$(Get-Date)"] Checking for server update..."
+        "["+$(Get-Date)+"] Checking for server update..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
 
-        if ($serverVersionCheck -like "*update*"){
-            Write-Host "["$(Get-Date)"] " "Server Has an Update. Update Starting."; "["+$(Get-Date)+"] " + "Server Has an Update. Update Starting." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
-            "$steamCmd\steamcmd.exe +login anonymous +app_update 2394010 validate +quit"
-            if ($tagRoleEnabled) {
-                Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
+        # Construct the SteamCMD command
+        $steamCMDCommand = "$steamCmd\steamcmd.exe +@ShutdownOnFailedCommand 1 +@NoPromptForPassword 1 +login anonymous +app_info_update 1 +app_status 2394010 +quit"
 
-                Server has an update! Starting upate now.
-                
-                Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
+        # Execute the SteamCMD command and capture the output
+        $serverVersionCheck = & cmd /c $steamCMDCommand | Select-String "^ - install state:"
+
+        if ($serverVersionCheck) {
+            # Extract the installation state from the output
+            $installState = $serverVersionCheck -replace '^[^:]*:\s*', ''
+
+            Write-Host "Server Installation State: $installState"  # Output the installation state
+
+            if ($installState -eq "uninstalled") {
+                Write-Host "["$(Get-Date)"] Server update available. Starting update process..."
+                "["+$(Get-Date)+"] Server update available. Starting update process..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
+
+                # Start the update process using SteamCMD
+                Start-Process -FilePath "$steamCmd\steamcmd.exe" -ArgumentList "+login anonymous +app_update 2394010 validate +quit" -NoNewWindow -Wait
+                Send-DiscordMessage -Message "Server has an update! Starting update now."
+
+                Write-Host "["$(Get-Date)"] Server update completed successfully."
+                "["+$(Get-Date)+"] Server update completed successfully." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
             } else {
-                Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster:
-
-                Server has an update! Starting upate now.
-                
-                Make sure you update your client!" -Title "Palworld Server Status" -Color 7582538
+                Write-Host "["$(Get-Date)"] No update available. Starting server..."
+                "["+$(Get-Date)+"] No update available. Starting server..." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
             }
-        } else {
-            Write-Host "["$(Get-Date)"] " "No Update Available. Starting Server."; "["+$(Get-Date)+"] " + "No Update Available. Starting Server." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
         }
     }
 
