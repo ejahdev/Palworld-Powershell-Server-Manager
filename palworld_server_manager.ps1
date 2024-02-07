@@ -88,7 +88,15 @@ function check_program {
 
                         # Start the update process using SteamCMD
                         Start-Process -FilePath "$steamCmd\steamcmd.exe" -ArgumentList "+login anonymous +app_update 2394010 validate +quit" -NoNewWindow -Wait
-                        Send-DiscordMessage -Message "Server has an update! Starting update now."
+                        if ($tagRoleEnabled) {
+                            Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
+                            
+                            Server has an update! Starting update now." -Title "Palworld Server Status" -Color 65280
+                        } else {
+                            Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
+                        
+                            Server has an update! Starting update now." -Title "Palworld Server Status" -Color 65280
+                        }
 
                         Write-Host "["$(Get-Date)"] Server update completed successfully."
                         "["+$(Get-Date)+"] Server update completed successfully." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
@@ -139,7 +147,15 @@ function start_server {
 
                 # Start the update process using SteamCMD
                 Start-Process -FilePath "$steamCmd\steamcmd.exe" -ArgumentList "+login anonymous +app_update 2394010 validate +quit" -NoNewWindow -Wait
-                Send-DiscordMessage -Message "Server has an update! Starting update now."
+                if ($tagRoleEnabled) {
+                    Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID>  
+                
+                    Server has an update! Starting update now." -Title "Palworld Server Status" -Color 65280
+                } else {
+                    Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
+                
+                    Server has an update! Starting update now." -Title "Palworld Server Status" -Color 65280
+                }
 
                 Write-Host "["$(Get-Date)"] Server update completed successfully."
                 "["+$(Get-Date)+"] Server update completed successfully." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
