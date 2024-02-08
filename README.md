@@ -2,7 +2,7 @@
 # PalWorld Server Manager Script<br>
 <br><br>
 Major credits to u/SpasticSquirr3l<br> 
-(this script is my edited version from his redit post https://www.reddit.com/r/Palworld/comments/1adj6t9/selfhost_server_autostartrebootupdate/ that I added a couple of features to.)<br><br>
+(this script is my edited version from his reddit post https://www.reddit.com/r/Palworld/comments/1adj6t9/selfhost_server_autostartrebootupdate/ that I added a couple of features to.)<br><br>
 ### What it handles:<br>
  - Daily Auto Restarts<br>
  - Hourly Backups<br>
