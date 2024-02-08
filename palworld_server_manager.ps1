@@ -66,7 +66,9 @@ function check_program {
             # Check for server update only if auto-update is enabled
             if ($autoUpdate) {
                 try {
-                    $lastCheckedBuildID = Invoke-RestMethod -Uri "https://api.steamcmd.net/v1/info/2394010" | Select-Object -ExpandProperty buildid
+                    $apiResponse = Invoke-RestMethod -Uri "https://api.steamcmd.net/v1/info/2394010"
+                    Write-Host "API Response: $apiResponse"  # Debugging output
+                    $lastCheckedBuildID = $apiResponse.buildid
                     $localBuildID = (Select-String -Path "$steamCMD\steamapps\appmanifest_2394010.acf" -Pattern "buildid").Line -replace '[a-z" \t\s]', ''
 
                     if ($lastCheckedBuildID -gt $localBuildID) {
@@ -74,11 +76,11 @@ function check_program {
 
                         if ($tagRoleEnabled) {
                             Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
-                            
+                                
                             Server has an update! Make sure to update your client!" -Title "Palworld Server Status" -Color 65280
                         } else {
                             Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
-                        
+                                
                             Server has an update! Make sure to update your client!" -Title "Palworld Server Status" -Color 65280
                         }
                         # Start the update process using SteamCMD
@@ -91,6 +93,7 @@ function check_program {
                     Write-Host "["$(Get-Date)"] " "Could not check for update. Logging error message. Make sure you have an internet connection. Starting server anyways."; "["+$(Get-Date)+"] " + "Could not check for update. Make sure you have an internet connection. Starting server anyways." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
                     $_ | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
                 }
+
             }
 
             start_server
@@ -113,7 +116,9 @@ function check_program {
 function start_server {
     if ($autoUpdate) {
         try {
-            $lastCheckedBuildID = Invoke-RestMethod -Uri "https://api.steamcmd.net/v1/info/2394010" | Select-Object -ExpandProperty buildid
+            $apiResponse = Invoke-RestMethod -Uri "https://api.steamcmd.net/v1/info/2394010"
+            Write-Host "API Response: $apiResponse"  # Debugging output
+            $lastCheckedBuildID = $apiResponse.buildid
             $localBuildID = (Select-String -Path "$steamCMD\steamapps\appmanifest_2394010.acf" -Pattern "buildid").Line -replace '[a-z" \t\s]', ''
 
             if ($lastCheckedBuildID -gt $localBuildID) {
@@ -121,11 +126,11 @@ function start_server {
 
                 if ($tagRoleEnabled) {
                     Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: <@&$discordRoleID> 
-                    
+                        
                     Server has an update! Make sure to update your client!" -Title "Palworld Server Status" -Color 65280
                 } else {
                     Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
-                
+                        
                     Server has an update! Make sure to update your client!" -Title "Palworld Server Status" -Color 65280
                 }
                 # Start the update process using SteamCMD
@@ -138,7 +143,11 @@ function start_server {
             Write-Host "["$(Get-Date)"] " "Could not check for update. Logging error message. Make sure you have an internet connection. Starting server anyways."; "["+$(Get-Date)+"] " + "Could not check for update. Make sure you have an internet connection. Starting server anyways." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
             $_ | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
         }
+
     }
+
+    Start-Process -FilePath "$PalworldFolder\PalServer.exe" -ArgumentList "-useperfthreads -NoAsyncLoadingThread -UseMultithreadForDS"
+    Write-Host "["$(Get-Date)"] " "Server Started."; "["+$(Get-Date)+"] " + "Server Started." | Out-File -FilePath "$PSScriptRoot\$log_file" -Append
 
     # Send a message to discord indicating the restart is complete
     Send-DiscordMessage -Message ":palm_up_hand: :mirror_ball: :rooster: 
