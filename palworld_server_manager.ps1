@@ -55,6 +55,8 @@ function check_program {
             Server will restart in $restart_warning seconds." -Title "Palworld Server Status" -Color 16711680
 
             $warning_sent = $true
+        } elseif ($server_timer -lt ($restart_interval - $restart_warning)) {
+            $warning_sent = $false
         }
 
         if ($server_timer -ge $restart_interval) {
